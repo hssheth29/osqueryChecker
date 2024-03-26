@@ -34,7 +34,13 @@ fn check_osquery_installed() -> Result<bool, String> {
 
 fn install_osquery() -> Result<(), String> {
     let version = "5.11.0";
-    let architecture = if cfg!(target_arch = "x86_64") { "x86_64" } else if cfg!(target_arch = "aarch64") { "aarch64" } else { return Err("Unsupported architecture".to_string()); };
+    let architecture = if cfg!(target_arch = "x86_64") {
+        "x86_64"
+    } else if cfg!(target_arch = "aarch64") {
+        "aarch64"
+    } else {
+        return Err("Unsupported architecture".to_string());
+    };
 
     // Determine Linux distribution (Debian-based or Fedora-based)
     let (package_type, package_manager) = if cfg!(target_os = "linux") {
@@ -49,11 +55,15 @@ fn install_osquery() -> Result<(), String> {
     let install_url = match package_type {
         "deb" => format!(
             "https://github.com/osquery/osquery/releases/download/{}/osquery_{}-1.linux_{}.deb",
-            version, version, architecture.replace("x86_64", "amd64").replace("aarch64", "arm64")
+            version,
+            version,
+            architecture.replace("x86_64", "amd64").replace("aarch64", "arm64")
         ),
         "rpm" => format!(
             "https://github.com/osquery/osquery/releases/download/{}/osquery-{}-1.linux.{}.rpm",
-            version, version, architecture
+            version,
+            version,
+            architecture
         ),
         _ => unreachable!(),
     };
@@ -79,7 +89,14 @@ fn install_osquery() -> Result<(), String> {
         return Err("Failed to download the osquery package.".to_string());
     }
 
-    let install_status = Command::new("sudo").args(&[package_manager, "install", "-y", &package_path]).status();
+    let sudo_check = Command::new("sudo").arg("-v").output();
+    if sudo_check.is_err() || !sudo_check.unwrap().status.success() {
+        return Err("Sudo privileges are required for installation.".to_string());
+    }
+
+    let install_status = Command::new("sudo")
+        .args(&[package_manager, "install", "-y", &package_path])
+        .status();
     if install_status.is_err() || !install_status.unwrap().success() {
         return Err("Failed to install osquery package.".to_string());
     }
