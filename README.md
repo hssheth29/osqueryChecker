@@ -1,40 +1,65 @@
 # osqueryChecker
 
-This is a simple Rust program to check for the installation of osquery on your system and install it if it's not already installed.
+`osqueryChecker` is a Rust-based tool designed to check if `osquery` is installed on a Linux system, and if not, automatically install it. This tool ensures that it operates with appropriate permissions by requiring sudo privileges for its execution.
 
-## Requirements
+## Prerequisites
 
-- Rust programming language and Cargo package manager installed.
-- `curl` and `dnf` (for Fedora-based systems) installed for downloading and installing osquery.
+Before you begin, ensure you have met the following requirements:
+
+- A Linux system with either a Debian-based or Fedora-based distribution.
+- Rust programming environment set up, including `cargo`.
+- `sudo` privileges on the system where `osqueryChecker` is to be executed.
 
 ## Installation
 
-1. Clone this repository to your local machine:
+To install `osqueryChecker`, follow these steps:
 
-    ```bash
-    git clone https://github.com/hssheth29/osqueryChecker.git
-    ```
+1. Clone the repository:
 
-2. Navigate to the repository directory:
+```bash
+git clone https://github.com/hssheth29/osqueryChecker.git
+```
 
-    ```bash
-    cd osqueryChecker
-    ```
+2. Navigate to the cloned repository directory:
 
-3. Compile and run the program:
+```bash
+cd osqueryChecker
+```
 
-    ```bash
-    cargo run
-    ```
+3. Compile the project using Cargo:
+
+```bash
+cargo build --release
+```
+
+This command compiles the application in release mode, optimizing for performance. The compiled binary will be located in `./target/release/osquerychecker`.
 
 ## Usage
 
-Simply run the program, and it will check if osquery is installed on your system. If not, it will proceed to download and install it.
+To use `osqueryChecker`, execute the binary with `sudo` to ensure it has the necessary permissions:
+
+```bash
+sudo ./target/release/osquerychecker
+```
+
+The program will check if `osquery` is installed. If it is not, it will attempt to download and install `osquery` automatically.
 
 ## Contributing
 
-Contributions are welcome! If you have any ideas, improvements, or bug fixes, feel free to open an issue or create a pull request.
+We welcome contributions to `osqueryChecker`. If you have suggestions, please:
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/yourFeature`).
+3. Make your changes and commit them (`git commit -am 'Add some feature'`).
+4. Push to the branch (`git push origin feature/yourFeature`).
+5. Open a pull request.
+
+Please make sure to update tests as appropriate.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](LICENSE) file for details.
+
+## Getting Help
+
+If you have questions or need further assistance, please open an issue in the project's GitHub repository.
