@@ -1,7 +1,16 @@
-use std::process::Command;
+extern crate nix;
+
+use nix::unistd::{geteuid, Uid};
+use std::process::{Command, exit};
 use std::fs;
 
 fn main() {
+    // Check for root privileges at the start of the program
+    if !is_root() {
+        println!("This program requires sudo privileges. Please run it as root.");
+        exit(1);
+    }
+
     match check_osquery_installed() {
         Ok(installed) => {
             if installed {
@@ -16,6 +25,10 @@ fn main() {
         }
         Err(e) => println!("Error checking osquery installation: {}", e),
     }
+}
+
+fn is_root() -> bool {
+    geteuid() == Uid::from_raw(0)
 }
 
 fn check_osquery_installed() -> Result<bool, String> {
@@ -87,11 +100,6 @@ fn install_osquery() -> Result<(), String> {
 
     if download_result.is_err() || !download_result.unwrap().success() {
         return Err("Failed to download the osquery package.".to_string());
-    }
-
-    let sudo_check = Command::new("sudo").arg("-v").output();
-    if sudo_check.is_err() || !sudo_check.unwrap().status.success() {
-        return Err("Sudo privileges are required for installation.".to_string());
     }
 
     let install_status = Command::new("sudo")
