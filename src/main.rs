@@ -1,6 +1,3 @@
-extern crate nix;
-
-use nix::unistd::{geteuid, Uid};
 use std::process::{Command, exit};
 use std::fs;
 
@@ -28,7 +25,14 @@ fn main() {
 }
 
 fn is_root() -> bool {
-    geteuid() == Uid::from_raw(0)
+    if let Ok(output) = Command::new("id").arg("-u").output() {
+        if let Ok(uid) = String::from_utf8(output.stdout) {
+            if let Ok(uid) = uid.trim().parse::<u32>() {
+                return uid == 0;
+            }
+        }
+    }
+    false
 }
 
 fn check_osquery_installed() -> Result<bool, String> {
@@ -102,8 +106,10 @@ fn install_osquery() -> Result<(), String> {
         return Err("Failed to download the osquery package.".to_string());
     }
 
-    let install_status = Command::new("sudo")
-        .args(&[package_manager, "install", "-y", &package_path])
+    let install_status = Command::new(package_manager)
+        .arg("install")
+        .arg("-y")
+        .arg(&package_path)
         .status();
     if install_status.is_err() || !install_status.unwrap().success() {
         return Err("Failed to install osquery package.".to_string());
